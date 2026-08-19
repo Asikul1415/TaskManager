@@ -28,8 +28,8 @@ func Execute(t *task.Task) {
 func httpGetRequest(path string) *http.Response {
 	resp, err := http.Get(path)
 	if err != nil {
-		log.Printf(" main.httpGetRequest: ошибка при GET-запросе к %s", path)
-		log.Printf(" main.httpGetRequest: %s", err)
+		log.Printf(" executor.httpGetRequest: ошибка при GET-запросе к %s", path)
+		log.Printf(" executor.httpGetRequest: %s", err)
 		return &http.Response{StatusCode: 400}
 	}
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"TaskManager/internal/executor"
 	"TaskManager/internal/task"
+	"TaskManager/internal/worker"
 	"log"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	}
 
 	for _, task := range queue {
-		executor.Execute(&task)
+		worker.Run(&task)
 		log.Printf("Задача id %d была успешно выполнена", task.Id)
 	}
 }

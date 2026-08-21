@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/bitly/go-simplejson"
 
@@ -32,6 +33,18 @@ func Execute(t *task.Task) {
 
 		var jsonMock *simplejson.Json = simplejson.New()
 		httpPostRequest(path, jsonMock)
+		return
+	}
+
+	if t.Type == task.FileRead {
+		filePath, isField := t.Args["path"]
+		if !isField {
+			log.Printf(" Task.Run: поле `path` отсутствует в параметрах задачи")
+			return
+		}
+
+		fileText := ReadFile(filePath)
+		log.Printf("Задача %d вернула текст файла: %s", t.Id, fileText)
 		return
 	}
 }
@@ -65,4 +78,17 @@ func httpPostRequest(path string, json *simplejson.Json) *http.Response {
 		return &http.Response{StatusCode: 400}
 	}
 	return response
+}
+
+// Читает файл по пути filePath. Возвращает текст файла.
+func ReadFile(filePath string) string {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		log.Printf(" executor.ReadFile: ошибка при чтении файла %s", filePath)
+		log.Printf(" executor.ReadFile: %s", err)
+		return ""
+	}
+
+	text := string(data)
+	return text
 }

@@ -1,9 +1,13 @@
 package executor
 
 import (
-	"TaskManager/internal/task"
+	"bytes"
 	"log"
 	"net/http"
+
+	"github.com/bitly/go-simplejson"
+
+	"TaskManager/internal/task"
 )
 
 // Выполняет данную задачу task
@@ -20,6 +24,14 @@ func Execute(t *task.Task) {
 	}
 
 	if t.Type == task.HttpPostRequest {
+		path, isField := t.Args["path"]
+		if !isField {
+			log.Printf(" Task.Run: поле `path` отсутствует в параметрах задачи")
+			return
+		}
+
+		var jsonMock *simplejson.Json = simplejson.New()
+		httpPostRequest(path, jsonMock)
 		return
 	}
 }
@@ -34,4 +46,23 @@ func httpGetRequest(path string) *http.Response {
 	}
 
 	return resp
+}
+
+// Выполняет POST-запрос HTTP по пути path, с JSON полученным из json. Возвращает ответ на POST-запрос.
+func httpPostRequest(path string, json *simplejson.Json) *http.Response {
+	jsonBytes, err := json.Bytes()
+	if err != nil {
+		log.Printf(" executor.httpPostRequest: ошибка при POST-запросе к %s. Не удалось преобразовать входящий JSON в массив байт", path)
+		log.Printf(" executor.httpPostRequest: %s", err)
+		return &http.Response{StatusCode: 400}
+	}
+
+	body := bytes.NewReader(jsonBytes)
+	response, err := http.Post(path, "applications/json", body)
+	if err != nil {
+		log.Printf(" executor.httpPostRequest: ошибка при POST-запросе к %s", path)
+		log.Printf(" executor.httpPostRequest: %s", err)
+		return &http.Response{StatusCode: 400}
+	}
+	return response
 }

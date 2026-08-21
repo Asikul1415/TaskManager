@@ -13,6 +13,7 @@ func main() {
 		{Id: 2, Type: task.HttpGetRequst, Args: map[string]string{"path": "https://google.com"}},
 		{Id: 3, Type: task.HttpPostRequest, Args: map[string]string{"path": "https://google.com"}},
 		{Id: 4, Type: task.FileRead, Args: map[string]string{"path": "./test_file.json"}},
+		{Id: 5, Type: task.TextFileWrite, Args: map[string]string{"filename": "test_write.txt", "text": "something about Lorem ipsum"}},
 	}
 
 	for _, task := range queue {

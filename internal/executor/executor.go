@@ -47,6 +47,22 @@ func Execute(t *task.Task) {
 		log.Printf("Задача %d вернула текст файла: %s", t.Id, fileText)
 		return
 	}
+
+	if t.Type == task.TextFileWrite {
+		fileName, isField := t.Args["filename"]
+		if !isField {
+			log.Printf(" Task.Run: поле `filename` отсутствует в параметрах задачи")
+			return
+		}
+
+		text, isField := t.Args["text"]
+		if !isField {
+			log.Printf(" Task.Run: поле `text` отсутствует в параметрах задачи")
+			return
+		}
+
+		writeTextFile(text, fileName)
+	}
 }
 
 // Выполняет GET-запрос HTTP по пути path. Возвращает ответ на GET-запрос.
@@ -91,4 +107,17 @@ func readFile(filePath string) string {
 
 	text := string(data)
 	return text
+}
+
+// Записывает в текстовый файл fileName текст text
+func writeTextFile(text string, fileName string) {
+	textBytes := []byte(text)
+	err := os.WriteFile(fileName, textBytes, os.ModeAppend)
+	if err != nil {
+		log.Printf(" executor.WriteTextFile: ошибка при записи текстового файла %s", fileName)
+		log.Printf(" executor.WriteTextFile: %s", err)
+		return
+	}
+
+	log.Printf(" executor.WriteTextFile: текстовый файл %s успешно записан", fileName)
 }

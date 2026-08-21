@@ -43,7 +43,7 @@ func Execute(t *task.Task) {
 			return
 		}
 
-		fileText := ReadFile(filePath)
+		fileText := readFile(filePath)
 		log.Printf("Задача %d вернула текст файла: %s", t.Id, fileText)
 		return
 	}
